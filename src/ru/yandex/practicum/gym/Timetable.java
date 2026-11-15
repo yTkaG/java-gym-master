@@ -4,34 +4,34 @@ import java.util.*;
 
 public class Timetable {
 
-    private HashMap<DayOfWeek, TreeMap<TimeOfDay, TrainingSession>> timetable = new HashMap<>();;
+    private HashMap<DayOfWeek, TreeMap<TimeOfDay, List<TrainingSession>>> timetable = new HashMap<>();;
 
     public void addNewTrainingSession(TrainingSession trainingSession) {
         DayOfWeek day = trainingSession.getDayOfWeek();
         TimeOfDay time = trainingSession.getTimeOfDay();
 
-        if (!timetable.containsKey(day)) {
-            timetable.put(day, new TreeMap<>());
-        }
+        TreeMap<TimeOfDay, List<TrainingSession>> daySchedule =
+                timetable.computeIfAbsent(day, k -> new TreeMap<>());
 
-        timetable.get(day).put(time, trainingSession);
+        List<TrainingSession> sessionsAtTime =
+                daySchedule.computeIfAbsent(time, k -> new ArrayList<>());
+
+        sessionsAtTime.add(trainingSession);
     }
 
-    public TreeMap<TimeOfDay, TrainingSession> getTrainingSessionsForDay(
-            DayOfWeek dayOfWeek) {
+    public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
         return timetable.getOrDefault(dayOfWeek, new TreeMap<>());
     }
 
-    public TrainingSession getTrainingSessionsForDayAndTime(
-            DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
+    public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
 
-        TreeMap<TimeOfDay, TrainingSession> dailySchedule =
+        TreeMap<TimeOfDay, List<TrainingSession>> dailySchedule =
                 timetable.get(dayOfWeek);
 
         if (dailySchedule == null) {
             return null;
         }
 
-        return dailySchedule.get(timeOfDay);
+        return dailySchedule.getOrDefault(timeOfDay, Collections.emptyList());
     }
 }
