@@ -109,7 +109,6 @@ public class TimetableTest {
 
         timetable.addNewTrainingSession(trainingSession);
 
-        // Проверяем, что во вторник тренировки нет
         Assertions.assertNull(
                 timetable.getTrainingSessionsForDayAndTime(
                         DayOfWeek.TUESDAY, new TimeOfDay(13, 0)));
@@ -136,16 +135,48 @@ public class TimetableTest {
         timetable.addNewTrainingSession(firstTrainingSession);
         timetable.addNewTrainingSession(secondTrainingSession);
 
-        // Проверяем, что количество занятий осталось равным одному
         Assertions.assertEquals(
                 1,
                 timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY).size());
 
-        // Проверяем, что в расписании сохранилась последняя добавленная тренировка
         Assertions.assertEquals(
                 secondTrainingSession,
                 timetable.getTrainingSessionsForDayAndTime(
                         DayOfWeek.MONDAY, new TimeOfDay(13, 0)));
     }
 
+    @Test
+    void testAddTrainingSessionSameTimeOnDifferentDays() {
+        Timetable timetable = new Timetable();
+
+        Coach coach = new Coach("Васильев", "Николай", "Сергеевич");
+        Group group = new Group("Акробатика для детей", Age.CHILD, 60);
+
+        TrainingSession mondaySession = new TrainingSession(
+                group, coach, DayOfWeek.MONDAY, new TimeOfDay(13, 0));
+
+        TrainingSession tuesdaySession = new TrainingSession(
+                group, coach, DayOfWeek.TUESDAY, new TimeOfDay(13, 0));
+
+        timetable.addNewTrainingSession(mondaySession);
+        timetable.addNewTrainingSession(tuesdaySession);
+
+        Assertions.assertEquals(
+                1,
+                timetable.getTrainingSessionsForDay(DayOfWeek.MONDAY).size());
+
+        Assertions.assertEquals(
+                1,
+                timetable.getTrainingSessionsForDay(DayOfWeek.TUESDAY).size());
+
+        Assertions.assertEquals(
+                mondaySession,
+                timetable.getTrainingSessionsForDayAndTime(
+                        DayOfWeek.MONDAY, new TimeOfDay(13, 0)));
+
+        Assertions.assertEquals(
+                tuesdaySession,
+                timetable.getTrainingSessionsForDayAndTime(
+                        DayOfWeek.TUESDAY, new TimeOfDay(13, 0)));
+    }
 }
