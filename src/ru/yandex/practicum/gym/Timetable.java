@@ -20,7 +20,8 @@ public class Timetable {
     }
 
     public TreeMap<TimeOfDay, List<TrainingSession>> getTrainingSessionsForDay(DayOfWeek dayOfWeek) {
-        return timetable.getOrDefault(dayOfWeek, new TreeMap<>());
+        TreeMap<DayOfWeek, TreeMap<TimeOfDay, List<TrainingSession>>> copyOfTimetable = new TreeMap<>(timetable);
+        return copyOfTimetable.getOrDefault(dayOfWeek, new TreeMap<>());
     }
 
     public List<TrainingSession> getTrainingSessionsForDayAndTime(DayOfWeek dayOfWeek, TimeOfDay timeOfDay) {
@@ -29,7 +30,7 @@ public class Timetable {
                 timetable.get(dayOfWeek);
 
         if (dailySchedule == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         return dailySchedule.getOrDefault(timeOfDay, Collections.emptyList());
@@ -41,11 +42,8 @@ public class Timetable {
         for (TreeMap<TimeOfDay, List<TrainingSession>> day : timetable.values()) {
             for (List<TrainingSession> sessions : day.values()) {
                 for (TrainingSession session : sessions) {
-                    if (countByCoaches.containsKey(session.getCoach())) {
-                        countByCoaches.put(session.getCoach(), countByCoaches.get(session.getCoach()) + 1);
-                    } else {
-                        countByCoaches.put(session.getCoach(), 1);
-                    }
+                    countByCoaches.put(session.getCoach(),
+                            countByCoaches.getOrDefault(session.getCoach(), 0) + 1);
                 }
             }
         }
